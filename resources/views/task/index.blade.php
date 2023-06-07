@@ -5,7 +5,7 @@
 <div class="row mt-5">
     <div class="col-md-10 offset-md-1">
         <h3 class="text-center mb-4">
-            {{$project->name}} Tasks
+            {{$project->name}}
         </h3>
         <div class="row">
             <div class="col-md-12">
@@ -37,6 +37,7 @@
         <div class="modal-content">
             <form class="g-3 needs-validation" novalidate id="edit_task_form">
                 <input type="hidden" id="task_id" value="" />
+                <input type="hidden" id="task_project_id" value="" />
                 @csrf
 
                 <div class="modal-header">

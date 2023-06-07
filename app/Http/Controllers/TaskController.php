@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Contract\TaskRepositoryInterface;
 use App\Http\Requests\Task\StoreTaskRequest;
-use App\Http\Requests\Task\UpdateTaskRequest;
+use App\Models\Project;
 
 class TaskController extends Controller
 {
@@ -75,32 +75,35 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Task $task): JsonResponse
+    public function update(Request $request): JsonResponse
     {
 
-        $formRequest = $request->all();
+        $input = $request->all();
+
+        // project from id
+        $project = Project::findOrFail($input['project_id']);
 
         $response = [
             'status' => 'error',
             'message' => 'Something went wrong.'
         ];
 
-        if (isset($formRequest['action']) && $formRequest['action'] == 'priority') {
+        if (isset($input['action']) && $input['action'] == 'priority') {
             //You are going to update task priority by drag and drop
-            foreach ($formRequest['order'] as $row) {
+            foreach ($input['order'] as $row) {
                 Task::where('id', $row['id'])->update(['priority' => $row['priority']]);
             }
 
             $response = [
                 'status' => 'success',
                 'message' => 'Priority has been updated successfully.',
-                'html' => view('task.partials.list', ['tasks' => Task::getAllTasks()])->render()
+                'html' => view('task.partials.list', ['tasks' => $project->tasks])->render()
             ];
         } else {
-            $formRequest = array_map('trim', $formRequest);
-            if (empty($formRequest['id'])) {
+            $input = array_map('trim', $input);
+            if (empty($input['id'])) {
                 //You are going to add new task
-                $task = Task::getTaskByName($formRequest['name']);
+                $task = Task::getTaskByName($input['name']);
                 if ($task) {
                     //Duplication with name
                     $response = [
@@ -109,35 +112,35 @@ class TaskController extends Controller
                     ];
                 } else {
                     $task = new Task;
-                    $task->name = $formRequest['name'];
-                    $task->priority = $formRequest['priority'];
+                    $task->name = $input['name'];
+                    $task->priority = $input['priority'];
 
                     if ($task->save()) {
                         $response = [
                             'status' => 'success',
                             'message' => 'You have added a task successfully.',
-                            'html' => view('task.partials.list', ['tasks' => Task::getAllTasks()])->render()
+                            'html' => view('task.partials.list', ['tasks' => $project->tasks])->render()
                         ];
                     }
                 }
             } else {
                 // Update existing task
-                if (Task::isDuplicated($formRequest['id'], $formRequest['name'])) {
+                if (Task::isDuplicated($input['id'], $input['name'])) {
                     // Throw error if task is duplicated
                     $response = [
                         'status' => 'error',
                         'message' => 'A duplicated task exists.',
                     ];
                 } else {
-                    $task = Task::find($formRequest['id']);
+                    $task = $this->repository->getTaskById($input['id']);
                     if ($task) {
-                        $task->name = $formRequest['name'];
-                        $task->priority = $formRequest['priority'];
+                        $task->name = $input['name'];
+                        $task->priority = $input['priority'];
                         if ($task->save()) {
                             $response = [
                                 'status' => 'success',
                                 'message' => 'You have updated a task successfully.',
-                                'html' => view('task.partials.list', ['tasks' => Task::getAllTasks()])->render()
+                                'html' => view('task.partials.list', ['tasks' => $project->tasks])->render()
                             ];
                         }
                     } else {

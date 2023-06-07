@@ -8,18 +8,21 @@ $(function () {
             var token = $("#csrf_token").val();
             let order = [];
             let id = null;
+            let projectId = null;
             $("#task_list .task-row").each(function (index, element) {
                 order.push({
                     id: $(this).attr("data-id"),
                     priority: index + 1,
                 });
                 id = $(this).attr("data-id");
+                projectId = $(this).attr("data-project-id");
             });
 
             let reqParam = {
                 action: "priority",
                 order: order,
                 _token: token,
+                project_id: projectId,
             };
             updateTask(reqParam, id);
         });
@@ -43,6 +46,7 @@ $(function () {
                     $("#task_id").val(response.data.id);
                     $("#task_name").val(response.data.name);
                     $("#task_priority").val(response.data.priority);
+                    $("#task_project_id").val(response.data.project_id);
                     $("#edit_task_form").removeClass("was-validated");
                     $("#edit_task_modal").modal("show");
                 } else {
@@ -65,6 +69,7 @@ $(function () {
                 id: $(this).find("#task_id").val(),
                 name: $(this).find("#task_name").val(),
                 priority: $(this).find("#task_priority").val(),
+                product_id: $(this).find("#task_project_id").val(),
                 _token: $(this).find("input[name='_token']").val(),
             };
             updateTask(reqParam, $(this).find("#task_id").val());

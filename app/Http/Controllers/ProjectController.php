@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 
 use App\Models\Project;
-use Illuminate\Http\Response;
 use App\Contract\ProjectRepositoryInterface;
 use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
@@ -77,22 +76,20 @@ class ProjectController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProjectRequest $request, Project $project): JsonResponse
+    public function update(UpdateProjectRequest $request, $id): JsonResponse
     {
         $attributes = $request->only([
             'name',
         ]);
 
-        $updateProject = $this->repository->updateProject($project, $attributes);
+        $updateProject = $this->repository->updateProject($id, $attributes);
 
         if ($updateProject) {
-            return response()->json(
-                [
-                    'data' =>  $updateProject,
-                    'status' => 'success',
-                    'message' => "Projected updated successfully"
-                ],
-            );
+            return response()->json([
+                'data' =>  $updateProject,
+                'status' => 'success',
+                'message' => "Projected updated successfully"
+            ]);
         }
 
         return response()->json([
