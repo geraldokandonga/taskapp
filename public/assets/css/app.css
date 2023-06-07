@@ -1,0 +1,15 @@
+.drop-placeholder {
+    background-color: #eee;
+    height: 3.5em;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    line-height: 1.2em;
+}
+
+.task-list-header {
+    border-bottom: 2px solid #dee2e6;
+    background: #e9ecef;
+    border: 1px solid #dee2e6;
+    font-weight: bold;
+    padding: 5px;
+}
